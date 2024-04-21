@@ -25,11 +25,19 @@ public class PatientEntity {
 	@SequenceGenerator(name="patientId_generator", sequenceName = "patient_seq", allocationSize=1)
 	private Long pId;
 	
+	private String pStatus ="PENDING";
+	
 	@Column(name = "P_FIRST_NAME")
 	private String pFirstName;
 	
 	@Column(name = "P_LAST_NAME")
 	private String pLastName;
+	
+	@Column(name = "P_GENDER")
+	private String pGender;
+	
+	@Column(name = "P_AGE")
+	private Integer pAge;
 	
 	@Column(name = "P_ADDRESS")
 	private String pAddress;

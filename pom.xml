@@ -62,7 +62,14 @@
          <groupId>org.springframework.boot</groupId>
          <artifactId>spring-boot-starter-cache</artifactId>
       </dependency>
-
+      
+		<!-- Redis Cache -->
+		<!--<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-data-redis</artifactId>
+			<version></version>
+		</dependency>
+-->
 	</dependencies>
 
 	<!--<build>

@@ -29,28 +29,28 @@ public class PatientService {
 		log.info("PatientService.findAllPatientDetails()");
 		return patientRepo.findAll();
 	}
-
+	@Cacheable(value = "patientEntity")
 	public List<PatientEntity> saveAllPatientDetails(List<PatientEntity> entitiesList) {
 		log.info("PatientService.savePatientDetails()");
 		log.debug("PatientService.entitiesList ::" +entitiesList.size()); 
 		return patientRepo.saveAll(entitiesList);
 	}
 	
-	@CachePut(value = "patientEntity", key = "#patientEntity.id")
+	@CachePut(value = "patientEntity")
 	public PatientEntity updatePatientDetails(PatientEntity entity) {
 		log.info("PatientService.updatePatientDetails()");
-		log.debug("updatePatientDetails.PId ::" +entity.getPId());  
+		//log.debug("updatePatientDetails.PId ::" +entity.getPId());  
 		return patientRepo.save(entity);  
 	}
 	
-	@Cacheable(value = "patientEntity", key = "#pid")
+	@Cacheable(value = "patientEntity")
 	public Optional<PatientEntity> findPatientById(Long pid) { 
 		log.info("PatientService.findPatientById()");
 		log.debug("PatientService.findById ::" +pid);  
 		return patientRepo.findById(pid); 
 	}
 
-	@CacheEvict(value = "patientEntity", key = "#pid")
+	@CacheEvict(value = "patientEntity")
 	public void deletePatientById(Long pid) { 
 		log.info("PatientService.deletePatientById()");
 		log.debug("PatientService.deleteById ::" +pid); 

@@ -48,7 +48,7 @@ public class PatientController {
 				
 			} else {
 				patients = patientEntities.stream()
-						.map(p -> new Patient(p.getPId(), p.getPFirstName(), p.getPLastName(), p.getPAddress()))
+						.map(p -> new Patient(p.getPId(), p.getPFirstName(), p.getPLastName(), p.getPGender(), p.getPAge(), p.getPAddress()))
 						.collect(Collectors.toList());
 				log.debug("Patients size::", patients.size());
 			}
@@ -84,7 +84,7 @@ public class PatientController {
 		log.info("PID::"+pid);
 		try {
 			Optional<PatientEntity> pEntity = patientService.findPatientById(pid);
-			log.debug("PID::" +pEntity);
+			log.debug("pEntity::" +pEntity);
 			
 			PatientEntity entity = null;
 			
@@ -96,12 +96,15 @@ public class PatientController {
 			
 			entity.setPFirstName(patient.getPatientFirstName());
 			entity.setPLastName(patient.getPatientLastName());
+			entity.setPGender(patient.getPatientGender());
+			entity.setPAge(patient.getPatientAge());
 			entity.setPAddress(patient.getPatientAddress());
 		
-			entity = patientService.updatePatientDetails(entity);
+			patientService.updatePatientDetails(entity);
 			
 			return new ResponseEntity<>("Updated Patient Details Successfully", HttpStatus.OK);
 		}catch (Exception e) {
+			log.info("Update - "+e.getMessage());
 			return new ResponseEntity<>("Error while Updating Patient Details ",HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -119,7 +122,7 @@ public class PatientController {
 				return new ResponseEntity<Object>("Patient Id Invalid", HttpStatus.NOT_FOUND);
 			}
 		
-			return new ResponseEntity<>("Patient Record Deleted Successfully ", HttpStatus.OK);
+			return new ResponseEntity<>("Patient Record Deleted Successfully ", HttpStatus.ACCEPTED);
 		}catch (Exception e) {
 			return new ResponseEntity<>("Error while Deleting Patient Records ",HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -129,7 +132,10 @@ public class PatientController {
 		log.info("PatientController.setEntityData()");
 		entityObj.setPFirstName(patient.getPatientFirstName());
 		entityObj.setPLastName(patient.getPatientLastName());
+		entityObj.setPGender(patient.getPatientGender());
+		entityObj.setPAge(patient.getPatientAge());
 		entityObj.setPAddress(patient.getPatientAddress());
+		
 		return entityObj;
 	}
 }
