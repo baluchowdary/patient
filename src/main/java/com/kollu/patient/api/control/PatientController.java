@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kollu.patient.api.dto.Patient;
 import com.kollu.patient.api.entity.PatientEntity;
-import com.kollu.patient.api.service.PatientDao;
+import com.kollu.patient.api.service.PatientService;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PatientController {
 	
+	
+	
 	@Autowired
-	private PatientDao patientDao;
+	private PatientService patientService;
 
 	
 	@GetMapping("/pfetchall")
@@ -38,7 +40,7 @@ public class PatientController {
 		try {
 			
 			List<Patient> patients = null;
-			List<PatientEntity>  patientEntities =patientDao.findAll();
+			List<PatientEntity>  patientEntities =patientService.findAllPatientDetails();
 			
 			if(patientEntities.isEmpty()) {
 				log.info("PatientEntity is Empty");
@@ -67,7 +69,7 @@ public class PatientController {
 			entityObj = setEntityData(patient, entityObj);
 			
 			 entitiesList.add(entityObj);
-			 patientDao.saveAll(entitiesList);
+			 patientService.saveAllPatientDetails(entitiesList);
 			
 			return new ResponseEntity<>("Patient Details Saved Successfully!", HttpStatus.CREATED);
 		}catch (Exception e) {
@@ -76,23 +78,15 @@ public class PatientController {
 			return new ResponseEntity<>("Unable to Save Patient Details",HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	private PatientEntity setEntityData(Patient patient, PatientEntity entityObj) {
-		entityObj.setPFirstName(patient.getPatientFirstName());
-		entityObj.setPLastName(patient.getPatientLastName());
-		entityObj.setPAddress(patient.getPatientAddress());
-		return entityObj;
-	}
-
+	
 	@PutMapping("/pupdate/{pid}")
 	public ResponseEntity<Object> updatePatientDetails(@PathVariable("pid") Long pid, @RequestBody Patient patient){
 		log.info("PID::"+pid);
 		try {
-			Optional<PatientEntity> pEntity = patientDao.findById(pid);
+			Optional<PatientEntity> pEntity = patientService.findPatientById(pid);
 			log.debug("PID::" +pEntity);
 			
 			PatientEntity entity = null;
-			List<PatientEntity> entities = new ArrayList<>();
 			
 			if(pEntity.isPresent()) {
 				 entity= pEntity.get();
@@ -103,9 +97,8 @@ public class PatientController {
 			entity.setPFirstName(patient.getPatientFirstName());
 			entity.setPLastName(patient.getPatientLastName());
 			entity.setPAddress(patient.getPatientAddress());
-			
-			entities.add(entity);
-			entities = patientDao.saveAll(entities);
+		
+			entity = patientService.updatePatientDetails(entity);
 			
 			return new ResponseEntity<>("Updated Patient Details Successfully", HttpStatus.OK);
 		}catch (Exception e) {
@@ -117,11 +110,11 @@ public class PatientController {
 	public ResponseEntity<Object> deletePatientDetails(@PathVariable("pid") Long pid){
 		try {
 			
-			Optional<PatientEntity> pEntity = patientDao.findById(pid);
+			Optional<PatientEntity> pEntity = patientService.findPatientById(pid);
 			log.debug("PID::" +pEntity);
 			
 			if(pEntity.isPresent()) {
-				patientDao.deleteById(pid);
+				patientService.deletePatientById(pid);
 			} else {
 				return new ResponseEntity<Object>("Patient Id Invalid", HttpStatus.NOT_FOUND);
 			}
@@ -130,5 +123,13 @@ public class PatientController {
 		}catch (Exception e) {
 			return new ResponseEntity<>("Error while Deleting Patient Records ",HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	private PatientEntity setEntityData(Patient patient, PatientEntity entityObj) {
+		log.info("PatientController.setEntityData()");
+		entityObj.setPFirstName(patient.getPatientFirstName());
+		entityObj.setPLastName(patient.getPatientLastName());
+		entityObj.setPAddress(patient.getPatientAddress());
+		return entityObj;
 	}
 }
