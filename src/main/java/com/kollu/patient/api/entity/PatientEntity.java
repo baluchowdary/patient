@@ -23,7 +23,7 @@ public class PatientEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patientId_generator")
 	@SequenceGenerator(name="patientId_generator", sequenceName = "patient_seq", allocationSize=1)
-	private long pId;
+	private Long pId;
 	
 	@Column(name = "P_FIRST_NAME")
 	private String pFirstName;

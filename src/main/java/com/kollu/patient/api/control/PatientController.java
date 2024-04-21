@@ -43,6 +43,7 @@ public class PatientController {
 			if(patientEntities.isEmpty()) {
 				log.info("PatientEntity is Empty");
 				return new ResponseEntity<>("Patient Details Not Available", HttpStatus.NOT_FOUND);
+				
 			} else {
 				patients = patientEntities.stream()
 						.map(p -> new Patient(p.getPId(), p.getPFirstName(), p.getPLastName(), p.getPAddress()))
@@ -54,34 +55,37 @@ public class PatientController {
 		}catch (Exception e) {
 			log.error("Error while fetching Patient Details::", e.getLocalizedMessage());
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		} 
 	}
 	
-	
 	@PostMapping("/psave")
-	public ResponseEntity<Object> savePatientDetails(@Valid @RequestBody Patient patient){
+	public ResponseEntity<Object> savePatientDetails(@RequestBody @Valid Patient patient){
 		try {
-		
-			List<PatientEntity> entities = new ArrayList<>();
-			PatientEntity entity = new PatientEntity();
+			PatientEntity entityObj = new PatientEntity();
+			List<PatientEntity> entitiesList = new ArrayList<>();
 			
-			entity.setPFirstName(patient.getPatientFirstName());
-			entity.setPLastName(patient.getPatientLastName());
-			entity.setPAddress(patient.getPatientAddress());
+			entityObj = setEntityData(patient, entityObj);
 			
-			entities.add(entity);
-			entities = patientDao.saveAll(entities);
+			 entitiesList.add(entityObj);
+			 patientDao.saveAll(entitiesList);
 			
 			return new ResponseEntity<>("Patient Details Saved Successfully!", HttpStatus.CREATED);
 		}catch (Exception e) {
-			log.error("Error while saving Patient details", e.getLocalizedMessage());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			//log.error("Error while saving Patient details", e.getLocalizedMessage());
+			log.info("Error while saving Patient details", e.getLocalizedMessage());
+			return new ResponseEntity<>("Unable to Save Patient Details",HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
+	private PatientEntity setEntityData(Patient patient, PatientEntity entityObj) {
+		entityObj.setPFirstName(patient.getPatientFirstName());
+		entityObj.setPLastName(patient.getPatientLastName());
+		entityObj.setPAddress(patient.getPatientAddress());
+		return entityObj;
+	}
+
 	@PutMapping("/pupdate/{pid}")
-	public ResponseEntity<Object> updatePatientDetails(@PathVariable("pid") long pid, @RequestBody Patient patient){
+	public ResponseEntity<Object> updatePatientDetails(@PathVariable("pid") Long pid, @RequestBody Patient patient){
 		log.info("PID::"+pid);
 		try {
 			Optional<PatientEntity> pEntity = patientDao.findById(pid);
@@ -109,9 +113,8 @@ public class PatientController {
 		}
 	}
 	
-	
 	@DeleteMapping("/pdelete/{pid}")
-	public ResponseEntity<Object> deletePatientDetails(@PathVariable("pid") long pid){
+	public ResponseEntity<Object> deletePatientDetails(@PathVariable("pid") Long pid){
 		try {
 			
 			Optional<PatientEntity> pEntity = patientDao.findById(pid);
