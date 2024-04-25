@@ -29,7 +29,7 @@ public class PatientService {
 		log.info("PatientService.findAllPatientDetails()");
 		return patientRepo.findAll();
 	}
-	@Cacheable(value = "patientEntity")
+
 	public List<PatientEntity> saveAllPatientDetails(List<PatientEntity> entitiesList) {
 		log.info("PatientService.savePatientDetails()");
 		log.debug("PatientService.entitiesList ::" +entitiesList.size()); 
